@@ -12,7 +12,8 @@ class File extends Model
         'album_id',
         'name',
         'extension',
-        'description'
+        'description',
+        'user_id'
     ];
 
     public function scopeGetFiles($query, $album_id) {

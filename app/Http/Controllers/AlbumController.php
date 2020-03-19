@@ -45,7 +45,8 @@ class AlbumController extends Controller {
                 'album_id' => $album->id,
                 'name' => $file->getClientOriginalName(),
                 'extension' => $extension,
-                'description' => ''
+                'description' => '',
+                'user_id' => Auth::user()->id
             ]);
             Storage::putFileAs($dir_path, $file, sprintf('%d.%s', $file_handle->id, $extension));
         }

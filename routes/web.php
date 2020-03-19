@@ -54,6 +54,10 @@ Route::middleware(['auth'])->group(function() {
 
     Route::post('/todo', 'TodoController@postIndex');
 
+    Route::get('/profile_photo/{id}', 'ProfileController@getProfilePhoto')->name('profile_photo');
+
+    Route::get('/cover_photo/{id}', 'ProfileController@getCoverPhoto')->name('cover_photo');
+
     // placed last so that the other routes won't match this
     Route::get('/{username?}', 'HomeController@getIndex')->name('index');
 

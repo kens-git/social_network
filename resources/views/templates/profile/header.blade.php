@@ -1,8 +1,16 @@
-<img src="" alt="User has no cover image" class="img-fluid">
+@if(isset($cover_file))
+    <img width="300" alt="error loading cover picture" class="img-fluid"
+        src="{{ route('albums.file', ['username' => $user->username,
+             'id' => $cover_file->album_id, 'file_id' => $cover_file->id]) }}">
+@endif
 <div class="row">
-    <div class="col-4">
-        <img src="" alt="User has no profile image" class="img-fluid">
-    </div>
+    @if(isset($profile_file))
+        <div class="col-4">
+            <img width="300" alt="error loading profile picture" class="img-fluid"
+                src="{{ route('albums.file', ['username' => $user->username,
+                    'id' => $profile_file->album_id, 'file_id' => $profile_file->id]) }}">
+        </div>
+    @endif
     <div class="col-8">
         <div class="row">
             <h1>{{ $user->first_name }} {{ $user->last_name }}</h1>

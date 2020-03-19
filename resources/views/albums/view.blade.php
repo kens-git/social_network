@@ -25,6 +25,10 @@
                             'id' => $file->album_id,
                             'file_id' => $file->id]) }}">
                     </a>
+                    @if($file->user_id == Auth::user()->id)
+                        <a href="{{ route('profile_photo', ['id' => $file->id]) }}">Set As Profile Picture</a>
+                        <a href="{{ route('cover_photo', ['id' => $file->id]) }}">Set As Cover Picture</a>
+                    @endif
                 @else
                     <a href="{{ route('albums.file.view',
                             ['username' => $user->username,

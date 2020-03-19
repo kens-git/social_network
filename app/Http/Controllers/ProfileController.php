@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Auth;
+use App\Album;
+use App\File;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -11,7 +13,7 @@ class ProfileController extends Controller {
         return view('profile.edit');
     }
 
-    protected function postEditProfile(Request $request) {
+    public function postEditProfile(Request $request) {
         $request->validate([
             'password' => 'same:password-repeat|min:12',
             'password-repeat' => 'min:12',
@@ -43,5 +45,39 @@ class ProfileController extends Controller {
         ]);
 
         return redirect()->route('index');
+    }
+
+    public function getProfilePhoto($id) {
+        $file = File::where('id', $id)->first();
+        if(!$file) {
+            return 'file doesn\'t exist';
+        }
+        $album = Album::where('id', $file->album_id)->first();
+        if(!$album) {
+            return 'album doesn\'t exist';
+        }
+        if($album->user_id != Auth::user()->id) {
+            return 'can\'t set photo from another user\'s album';
+        }
+        Auth::user()->update(['profile_photo_id' => $id]);
+        // return view/route with success message
+        return redirect()->back();
+    }
+
+    public function getCoverPhoto($id) {
+        // factor out with getProfilePhoto()
+        $file = File::where('id', $id)->first();
+        if(!$file) {
+            return 'file doesn\'t exist';
+        }
+        $album = Album::where('id', $file->album_id)->first();
+        if(!$album) {
+            return 'album doesn\'t exist';
+        }
+        if($album->user_id != Auth::user()->id) {
+            return 'can\'t set photo from another user\'s album';
+        }
+        Auth::user()->update(['cover_photo_id' => $id]);
+        return redirect()->back();
     }
 }

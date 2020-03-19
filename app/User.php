@@ -26,7 +26,9 @@ class User extends Model implements AuthenticatableContract {
         'phone',
         'email',
         'website',
-        'is_admin'];
+        'is_admin',
+        'profile_photo_id',
+        'cover_photo_id'];
 
     public function getName() {
         if($this->first_name && $this->last_name) {

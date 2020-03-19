@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\File;
 use App\User;
 use App\WallPost;
 use Auth;
@@ -22,7 +23,10 @@ class HomeController extends Controller
         $statuses = WallPost::where(
             ['wall_user_id' => $user->id, 'parent_id' => null])->orderBy('updated_at', 'desc')->get();
         //$posts = User::getWallPostsForUser($user);
-        return view('index')->with(['user' => $user, 'statuses' => $statuses]);
+        $cover_file = File::where('id', $user->cover_photo_id)->first();
+        $profile_file = File::where('id', $user->profile_photo_id)->first();
+        return view('index')->with(['user' => $user, 'statuses' => $statuses,
+            'cover_file' => $cover_file, 'profile_file' => $profile_file]);
     }
 
     public function postIndex(Request $request, $username, $parent_id = null) {
