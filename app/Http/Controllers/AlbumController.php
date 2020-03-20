@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Auth;
+use Image;
 use App\Album;
 use App\File;
 use App\FileComment;
@@ -37,6 +38,7 @@ class AlbumController extends Controller {
             'name' => $request->input('name')
         ]);
         $dir_path = sprintf('/uploads/%d/%d', Auth::user()->id, $album->id);
+        // check if directory exists instead of creating it every time, in case makeDirectory changes in the future
         Storage::disk('local')->makeDirectory($dir_path);
         $files = $request->file('files');
         foreach($files as $file) {
@@ -49,6 +51,18 @@ class AlbumController extends Controller {
                 'user_id' => Auth::user()->id
             ]);
             Storage::putFileAs($dir_path, $file, sprintf('%d.%s', $file_handle->id, $extension));
+
+            $filenamewithextension = $file->getClientOriginalName();
+            //$filename = pathinfo($filenamewithextension, PATHINFO_FILENAME);
+            $extension = $this->mime2ext($file->getMimeType());
+            $filenametostore = $file_handle->id.'-thumbnail.'.$extension;
+            // TODO: any reason to store this just to retrieve it and resize it?
+            Storage::putFileAs($dir_path, $file, $filenametostore);
+            $thumbnailpath = $dir_path.'/'.$filenametostore;
+            $img = Image::make(storage_path().'/app/files/'.$thumbnailpath)->resize(300, 300, function($constraint) {
+                $constraint->aspectRatio();
+            })->encode();
+            Storage::put($dir_path.'/'.$filenametostore, $img);
         }
         return redirect()->route('albums');
     }
@@ -67,7 +81,7 @@ class AlbumController extends Controller {
         return view('albums.view')->with(['user' => $user, 'files' => $files, 'album_path' => $album_path]);
     }
 
-    public function getAlbumFile($username, $album_id, $file_id) {
+    public function getAlbumFile($username, $album_id, $file_id, $is_thumbnail = false) {
         $file = File::where('id', $file_id)->first();
         if(!$file) {
             // TODO: file not found error view
@@ -81,7 +95,11 @@ class AlbumController extends Controller {
             return 'should be user not found error';
         }
         //$path = 'uploads/1/2/2.jpg';
-        $path = sprintf('uploads/%d/%d/%d.%s', $user->id, $album_id, $file_id, $file->extension);
+        if($is_thumbnail) {
+            $path = sprintf('uploads/%d/%d/%d-thumbnail.%s', $user->id, $album_id, $file_id, $file->extension);
+        } else {
+            $path = sprintf('uploads/%d/%d/%d.%s', $user->id, $album_id, $file_id, $file->extension);
+        }
         //dd($path);
         if(!Storage::exists($path)) {
             // TODO: show error message

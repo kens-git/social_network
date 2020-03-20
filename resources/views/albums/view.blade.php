@@ -20,10 +20,11 @@
                             ['username' => $user->username,
                             'id' => $file->album_id,
                             'file_id' => $file->id]) }}">
-                        <img width="300" src="{{ route('albums.file',
+                        <img height="300"src="{{ route('albums.file',
                             ['username' => $user->username,
                             'id' => $file->album_id,
-                            'file_id' => $file->id]) }}">
+                            'file_id' => $file->id,
+                            'is_thumbnail' => true]) }}">
                     </a>
                     @if($file->user_id == Auth::user()->id)
                         <a href="{{ route('profile_photo', ['id' => $file->id]) }}">Set As Profile Picture</a>

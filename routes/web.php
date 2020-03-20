@@ -25,10 +25,11 @@ Route::middleware(['auth'])->group(function() {
 
     Route::get('/albums/{username}/{id}', 'AlbumController@getAlbumsView')->name('albums.view');
 
-    Route::get('/albums/{username}/{id}/{file_id}', 'AlbumController@getAlbumFile')->name('albums.file');
-
     Route::get('albums/{username}/{id}/{file_id}/view', 'AlbumController@getAlbumFileView')
         ->name('albums.file.view');
+
+    Route::get('/albums/{username}/{id}/{file_id}/{is_thumbnail?}', 'AlbumController@getAlbumFile')
+        ->name('albums.file');
 
     Route::post('albums/{username}/{id}/{file_id}', 'AlbumController@postAlbumFileView')
         ->name('post.file.view');
