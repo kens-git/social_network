@@ -52,7 +52,7 @@ class AlbumController extends Controller {
             ]);
             Storage::putFileAs($dir_path, $file, sprintf('%d.%s', $file_handle->id, $extension));
 
-            if(is_image($file->getMimeType())) {
+            if($this->is_image($file->getMimeType())) {
                 $filenamewithextension = $file->getClientOriginalName();
                 //$filename = pathinfo($filenamewithextension, PATHINFO_FILENAME);
                 $extension = $this->mime2ext($file->getMimeType());
