@@ -52,17 +52,19 @@ class AlbumController extends Controller {
             ]);
             Storage::putFileAs($dir_path, $file, sprintf('%d.%s', $file_handle->id, $extension));
 
-            $filenamewithextension = $file->getClientOriginalName();
-            //$filename = pathinfo($filenamewithextension, PATHINFO_FILENAME);
-            $extension = $this->mime2ext($file->getMimeType());
-            $filenametostore = $file_handle->id.'-thumbnail.'.$extension;
-            // TODO: any reason to store this just to retrieve it and resize it?
-            Storage::putFileAs($dir_path, $file, $filenametostore);
-            $thumbnailpath = $dir_path.'/'.$filenametostore;
-            $img = Image::make(storage_path().'/app/files/'.$thumbnailpath)->resize(300, 300, function($constraint) {
-                $constraint->aspectRatio();
-            })->encode();
-            Storage::put($dir_path.'/'.$filenametostore, $img);
+            if(is_image($file->getMimeType())) {
+                $filenamewithextension = $file->getClientOriginalName();
+                //$filename = pathinfo($filenamewithextension, PATHINFO_FILENAME);
+                $extension = $this->mime2ext($file->getMimeType());
+                $filenametostore = $file_handle->id.'-thumbnail.'.$extension;
+                // TODO: any reason to store this just to retrieve it and resize it?
+                Storage::putFileAs($dir_path, $file, $filenametostore);
+                $thumbnailpath = $dir_path.'/'.$filenametostore;
+                $img = Image::make(storage_path().'/app/files/'.$thumbnailpath)->resize(300, 300, function($constraint) {
+                    $constraint->aspectRatio();
+                })->encode();
+                Storage::put($dir_path.'/'.$filenametostore, $img);
+            }
         }
         return redirect()->route('albums');
     }
@@ -148,6 +150,37 @@ class AlbumController extends Controller {
             'content' => $request->input('comment')
         ]);
         return redirect()->route('albums.file.view', [$username, $album_id, $file_id]);
+    }
+
+    protected function is_image($mime) {
+        $mime_map = [
+            'image/bmp'                                                                 => 'bmp',
+            'image/x-bmp'                                                               => 'bmp',
+            'image/x-bitmap'                                                            => 'bmp',
+            'image/x-xbitmap'                                                           => 'bmp',
+            'image/x-win-bitmap'                                                        => 'bmp',
+            'image/x-windows-bmp'                                                       => 'bmp',
+            'image/ms-bmp'                                                              => 'bmp',
+            'image/x-ms-bmp'                                                            => 'bmp',
+            'image/cdr'                                                                 => 'cdr',
+            'image/x-cdr'                                                               => 'cdr',
+            'image/gif'                                                                 => 'gif',
+            'image/x-icon'                                                              => 'ico',
+            'image/x-ico'                                                               => 'ico',
+            'image/vnd.microsoft.icon'                                                  => 'ico',
+            'image/jp2'                                                                 => 'jp2',
+            'image/jpx'                                                                 => 'jp2',
+            'image/jpm'                                                                 => 'jp2',
+            'image/jpeg'                                                                => 'jpeg',
+            'image/pjpeg'                                                               => 'jpeg',
+            'image/png'                                                                 => 'png',
+            'image/x-png'                                                               => 'png',
+            'image/vnd.adobe.photoshop'                                                 => 'psd',
+            'image/svg+xml'                                                             => 'svg',
+            'image/tiff'                                                                => 'tiff',
+        ];
+
+        return isset($mime_map[$mime]) === true;
     }
 
     protected function mime2ext($mime) {
