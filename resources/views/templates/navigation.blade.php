@@ -1,14 +1,9 @@
-<nav class="navbar justify-content-start">
-    <a class="nav-link" href="{{ route('index') }}">Home</a>
-    <a class="nav-link" href="{{ route('activity') }}">Activity</a>
-    <a class="nav-link" href="{{ route('messages') }}">Messages</a>
-    <a class="nav-link" href="{{ route('albums') }}">Albums</a>
-    <a class="nav-link" href="{{ route('directory') }}">Directory</a>
-    <a class="nav-link" href="{{ route('profile.edit') }}">Edit Profile</a>
-    <a class="nav-link" href="{{ route('logout') }}">Logout</a>
-    {{-- Commented out search bar --}}
-    {{-- <form class="form-inline my-2 my-lg-0 ml-auto">
-        <input class="form-control mr-sm-2" type="search" placeholder="Search">
-        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-    </form> --}}
-</nav>
+<div id="top-nav">
+    <a href="{{ route('index') }}" class="">Home</a>
+    <a href="{{ route('activity') }}" class="">Activity</a>
+    <a href="{{ route('messages') }}" class="">Messages</a>
+    <a href="{{ route('albums') }}" class="">Albums</a>
+    <a href="{{ route('directory') }}" class="">Directory</a>
+    <a href="{{ route('profile.edit') }}" class="">Edit Profile</a>
+    <a href="{{ route('logout') }}" class="">Logout</a>
+</div>

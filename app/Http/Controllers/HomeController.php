@@ -6,6 +6,7 @@ use App\File;
 use App\User;
 use App\WallPost;
 use Auth;
+use Image;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller

@@ -5,8 +5,11 @@ namespace App\Http\Controllers;
 use Auth;
 use App\Album;
 use App\File;
+use App\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\Storage;
 
 class ProfileController extends Controller {
     protected function getEditProfile() {
@@ -15,8 +18,8 @@ class ProfileController extends Controller {
 
     public function postEditProfile(Request $request) {
         $request->validate([
-            'password' => 'same:password-repeat|min:12',
-            'password-repeat' => 'min:12',
+            'password' => 'nullable|same:password-repeat|min:12',
+            'password-repeat' => 'nullable|min:12',
             'first_name' => 'nullable|min:1',
             'last_name' => 'nullable|min:1',
             'occupation' => 'nullable|min:1',
@@ -50,6 +53,78 @@ class ProfileController extends Controller {
     public function getProfilePhoto($id) {
         $file = File::where('id', $id)->first();
         if(!$file) {
+            return $this->getDefaultProfilePhoto();
+        }
+        $user = User::where('id', $file->user_id)->first();
+        if(!$user) {
+            // TODO:
+            //return 'should be user not found error';
+            return $this->getDefaultProfilePhoto();
+        }
+        $path = sprintf('uploads/%d/%d/%d.%s', $user->id, $file->album_id, $file->id, $file->extension);
+        //dd($path);
+        if(!Storage::exists($path)) {
+            // TODO: show error message
+            return 'file not found on disk';
+        }
+
+        $file = Storage::get($path);
+        $type = Storage::mimeType($path);
+
+        $headers = ['Content-Type' => Storage::mimeType($path)];
+        $response = Response::make($file, 200, $headers);
+    
+        return $response;
+    }
+
+    public function getCoverPhoto($id) {
+        $file = File::where('id', $id)->first();
+        if(!$file) {
+            return $this->getDefaultCoverPhoto();
+        }
+        $user = User::where('id', $file->user_id)->first();
+        if(!$user) {
+            // TODO:
+            //return 'should be user not found error';
+            return $this->getDefaultCoverPhoto();
+        }
+        $path = sprintf('uploads/%d/%d/%d.%s', $user->id, $file->album_id, $file->id, $file->extension);
+        //dd($path);
+        if(!Storage::exists($path)) {
+            // TODO: show error message
+            return 'file not found on disk';
+        }
+
+        $file = Storage::get($path);
+        $type = Storage::mimeType($path);
+
+        $headers = ['Content-Type' => Storage::mimeType($path)];
+        $response = Response::make($file, 200, $headers);
+    
+        return $response;
+    }
+
+    protected function getDefaultCoverPhoto() {
+        $path = 'default_cover.png';
+        $file = Storage::get($path);
+        $type = Storage::mimeType($path);
+        $headers = ['Content-Type' => Storage::mimeType($path)];
+        $response = Response::make($file, 200, $headers);
+        return $response;
+    }
+
+    protected function getDefaultProfilePhoto() {
+        $path = 'default_profile.png';
+        $file = Storage::get($path);
+        $type = Storage::mimeType($path);
+        $headers = ['Content-Type' => Storage::mimeType($path)];
+        $response = Response::make($file, 200, $headers);
+        return $response;
+    }
+
+    public function postProfilePhoto($id) {
+        $file = File::where('id', $id)->first();
+        if(!$file) {
             return 'file doesn\'t exist';
         }
         $album = Album::where('id', $file->album_id)->first();
@@ -64,7 +139,7 @@ class ProfileController extends Controller {
         return redirect()->back();
     }
 
-    public function getCoverPhoto($id) {
+    public function postCoverPhoto($id) {
         // factor out with getProfilePhoto()
         $file = File::where('id', $id)->first();
         if(!$file) {

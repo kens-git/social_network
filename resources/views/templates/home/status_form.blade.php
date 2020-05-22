@@ -1,12 +1,5 @@
-<form method="post" action="{{ route('index', ['username' => $user->username]) }}">
+<form id="wall-post-form" method="post" action="{{ route('index', ['username' => $user->username]) }}">
     @csrf()
-    <div class="form-group">
-        @error('status')
-            <div class="alert alert-danger">{{ $message }}</div>
-        @enderror
-        <textarea name="status"></textarea>
-    </div>
-    <div class="form-group">
-        <input type="submit" value="Post Status">
-    </div>
+    <textarea name="status" placeholder="Post on {{ $user->getNameOrUsername() }}'s profile"></textarea>
+    <input type="submit" id="wall-post-button" value="Post">
 </form>
