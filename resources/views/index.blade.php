@@ -22,6 +22,58 @@
             </div>
             <div id="recent-activity-section">
                 <h1 class="section-header">Recent Activity</h1>
+                @foreach($activity as $a)
+                    @if($a->activity_type == 'wall_post')
+                        @php
+                            $post_user = App\User::where('id', $a->user_id)->first();
+                            $wall_user = App\User::where('id', $a->wall_user_id)->first();
+                        @endphp
+                        <a href="{{ route('index', ['username' => $wall_user->username]) }}">
+                            <div class="recent-activity">
+                                <h2>
+                                @if($post_user->id == $wall_user->id)
+                                    Posted on their profile.
+                                @else
+                                    Posted on <b>{{ $wall_user->getNameOrUsername() }}'s</b> profile.
+                                @endif
+                                </h2>
+                                <h3>{{ $a->updated_at }}</h3>
+                            </div>
+                        </a>
+                    @elseif($a->activity_type == 'album')
+                        @php
+                            $user = App\User::where('id', $a->user_id)->first();
+                            $file_count = App\File::where('album_id', $a->id)->get()->count();
+                        @endphp
+                        <a href="{{ route('albums.view', ['username' => $user->username, 'id' => $a->id]) }}">
+                            <div class="recent-activity">
+                                <h2>
+                                    Added <b>{{ $file_count }}</b> files to <b>{{ $a->name }}</b>.
+                                </h2>
+                                <h3>{{ $a->updated_at }}</h3>
+                            </div>
+                        </a>
+                    @elseif($a->activity_type == 'file_comment')
+                        @php
+                            $user = App\User::where('id', $a->user_id)->first();
+                            $file = App\File::where('id', $a->file_id)->first();
+                            $album = App\Album::where('id', $file->album_id)->first();
+                            $file_user = App\User::where('id', $album->user_id)->first();
+                        @endphp
+                        <a href="{{ route('albums.file.view', [$file_user->username, $album->id, $file->id]) }}">
+                            <div class="recent-activity">
+                                <h2>
+                                @if($user->id == $file_user->id)
+                                    Commented on their file.
+                                @else
+                                    Commented on <b>{{ $file_user->getNameOrUsername() }}'s</b> file.
+                                @endif
+                                </h2>
+                                <h3>{{ $a->updated_at }}</h3>
+                            </div>
+                        </a>
+                    @endif
+                @endforeach
             </div>
         </div>
         <div id="wall-posts">

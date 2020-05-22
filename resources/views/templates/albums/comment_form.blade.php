@@ -1,4 +1,4 @@
-<form method="post" class="col-9 align-self-end"
+<form id="file-comment-form" method="post" class="col-9 align-self-end"
         action="{{ route('post.file.view', [$user->username, $album_id, $file->id]) }}">
     @csrf()
     <div class="form-group">

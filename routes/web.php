@@ -25,14 +25,20 @@ Route::middleware(['auth'])->group(function() {
 
     Route::get('/albums/{username}/{id}', 'AlbumController@getAlbumsView')->name('albums.view');
 
+    Route::get('/albums/{username}/{id}/{file_id}/preview', 'AlbumController@getAlbumFilePreview')
+        ->name('albums.file_preview');
+
     Route::get('albums/{username}/{id}/{file_id}/view', 'AlbumController@getAlbumFileView')
         ->name('albums.file.view');
 
-    Route::get('/albums/{username}/{id}/{file_id}/{is_thumbnail?}', 'AlbumController@getAlbumFile')
+    Route::get('/albums/{username}/{id}/{file_id}', 'AlbumController@getAlbumFile')
         ->name('albums.file');
 
     Route::post('albums/{username}/{id}/{file_id}', 'AlbumController@postAlbumFileView')
         ->name('post.file.view');
+
+    Route::get('/albums/{username}/{id}/{file_id}/full_size', 'AlbumController@getFullSizeAlbumFile')
+        ->name('albums.file.full_size');
 
     Route::get('/messages/{username?}', 'MessageController@getMessages')->name('messages');
 
@@ -58,6 +64,10 @@ Route::middleware(['auth'])->group(function() {
     Route::get('/profile_photo/{id}', 'ProfileController@getProfilePhoto')->name('profile_photo');
 
     Route::get('/cover_photo/{id}', 'ProfileController@getCoverPhoto')->name('cover_photo');
+
+    Route::get('/set_profile_photo/{id}', 'ProfileController@setProfilePhoto')->name('set_profile_photo');
+
+    Route::get('/set_cover_photo/{id}', 'ProfileController@setCoverPhoto')->name('set_cover_photo');
 
     // placed last so that the other routes won't match this
     Route::get('/{username?}', 'HomeController@getIndex')->name('index');

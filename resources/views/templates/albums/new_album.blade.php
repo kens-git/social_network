@@ -1,4 +1,4 @@
-<form method="post" action="{{ route('albums') }}" enctype="multipart/form-data">
+<form id="new-album-form" method="post" action="{{ route('albums') }}" enctype="multipart/form-data">
     @csrf()
     <div class="form-group">
         @error('name')

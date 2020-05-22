@@ -20,7 +20,10 @@ class AlbumController extends Controller {
                 return view('errors.user_not_found')->with('username', $username);
             }
             $albums = Album::getAlbums($user->id);
-            return view('albums.index')->with(['user' => $user, 'albums' => $albums]);
+            $cover_file = File::where('id', $user->cover_photo_id)->first();
+            $profile_file = File::where('id', $user->profile_photo_id)->first();
+            return view('albums.index')->with(['user' => $user, 'albums' => $albums,
+                'cover_file' => $cover_file, 'profile_file' => $profile_file]);
         }
         $albums = Album::getAlbums();
         return view('albums.index')->with(['user' => Auth::user(), 'albums' => $albums]);
@@ -80,10 +83,13 @@ class AlbumController extends Controller {
         }
         $files = File::getFiles($album->id);
         $album_path = sprintf('app/files/uploads/%d/%d', Auth::user()->id, $album->id);
-        return view('albums.view')->with(['user' => $user, 'files' => $files, 'album_path' => $album_path]);
+        $cover_file = File::where('id', $user->cover_photo_id)->first();
+        $profile_file = File::where('id', $user->profile_photo_id)->first();
+        return view('albums.view')->with(['user' => $user, 'files' => $files, 'album_path' => $album_path,
+            'cover_file' => $cover_file, 'profile_file' => $profile_file]);
     }
 
-    public function getAlbumFile($username, $album_id, $file_id, $is_thumbnail = false) {
+    public function getAlbumFilePreview($username, $album_id, $file_id) {
         $file = File::where('id', $file_id)->first();
         if(!$file) {
             // TODO: file not found error view
@@ -96,12 +102,7 @@ class AlbumController extends Controller {
             // TODO:
             return 'should be user not found error';
         }
-        //$path = 'uploads/1/2/2.jpg';
-        if($is_thumbnail) {
-            $path = sprintf('uploads/%d/%d/%d-thumbnail.%s', $user->id, $album_id, $file_id, $file->extension);
-        } else {
-            $path = sprintf('uploads/%d/%d/%d.%s', $user->id, $album_id, $file_id, $file->extension);
-        }
+        $path = sprintf('uploads/%d/%d/%d.%s', $user->id, $album_id, $file_id, $file->extension);
         //dd($path);
         if(!Storage::exists($path)) {
             // TODO: show error message
@@ -110,6 +111,51 @@ class AlbumController extends Controller {
 
         $file = Storage::get($path);
         $type = Storage::mimeType($path);
+
+        if($this->is_image($type)) {
+            $image = Image::make($file);
+            $image->fit(299, 250);
+            return $image->response();
+        }
+
+        $headers = ['Content-Type' => Storage::mimeType($path)];
+        $response = Response::make($file, 200, $headers);
+    
+        return $response;
+    }
+
+    public function getAlbumFile($username, $album_id, $file_id) {
+        $file = File::where('id', $file_id)->first();
+        if(!$file) {
+            // TODO: file not found error view
+            return 'file not found in database';
+        }
+        // $path = storage_path('app/files/uploads/') . $username . '/' .
+        //     $album_id . '/' . $file_id . '.' . $file->extension;
+        $user = User::where('username', $username)->first();
+        if(!$user) {
+            // TODO:
+            return 'should be user not found error';
+        }
+        $path = sprintf('uploads/%d/%d/%d.%s', $user->id, $album_id, $file_id, $file->extension);
+        if(!Storage::exists($path)) {
+            // TODO: show error message
+            return 'file not found on disk';
+        }
+
+        $file = Storage::get($path);
+        $type = Storage::mimeType($path);
+
+        if($this->is_image($type)) {
+            $image = Image::make($file);
+            $image = $image->widen(1200, function ($constraint) {
+                $constraint->upsize();
+            });
+            $image = $image->heighten(1200, function ($constraint) {
+                $constraint->upsize();
+            });
+            return $image->response();
+        }
 
         $headers = ['Content-Type' => Storage::mimeType($path)];
         $response = Response::make($file, 200, $headers);
@@ -124,11 +170,15 @@ class AlbumController extends Controller {
         }
         $file = File::where('id', $file_id)->first();
         $comments = FileComment::where('file_id', $file_id)->orderBy('updated_at', 'desc')->get();
+        $cover_file = File::where('id', $user->cover_photo_id)->first();
+        $profile_file = File::where('id', $user->profile_photo_id)->first();
         return view('albums.file_view')->with([
             'user' => $user,
             'album_id' => $album_id,
             'file' => $file,
-            'comments' => $comments
+            'comments' => $comments,
+            'cover_file' => $cover_file,
+            'profile_file' => $profile_file
         ]);
     }
 
@@ -150,6 +200,34 @@ class AlbumController extends Controller {
             'content' => $request->input('comment')
         ]);
         return redirect()->route('albums.file.view', [$username, $album_id, $file_id]);
+    }
+
+    public function getFullSizeAlbumFile(Request $request, $username, $album_id, $file_id) {
+        $file = File::where('id', $file_id)->first();
+        if(!$file) {
+            // TODO: file not found error view
+            return 'file not found in database';
+        }
+        // $path = storage_path('app/files/uploads/') . $username . '/' .
+        //     $album_id . '/' . $file_id . '.' . $file->extension;
+        $user = User::where('username', $username)->first();
+        if(!$user) {
+            // TODO:
+            return 'should be user not found error';
+        }
+        $path = sprintf('uploads/%d/%d/%d.%s', $user->id, $album_id, $file_id, $file->extension);
+        if(!Storage::exists($path)) {
+            // TODO: show error message
+            return 'file not found on disk';
+        }
+
+        $file = Storage::get($path);
+        $type = Storage::mimeType($path);
+
+        $headers = ['Content-Type' => Storage::mimeType($path)];
+        $response = Response::make($file, 200, $headers);
+    
+        return $response;
     }
 
     protected function is_image($mime) {

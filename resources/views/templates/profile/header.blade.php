@@ -4,8 +4,8 @@
     @else
         <img id="cover-photo" src="{{ route('cover_photo', ['id' => -1]) }}"/>
     @endif
-    @if(isset($header_file->id))
-        <a href="{{ route('index', ['user->username']) }}"><img id="profile-photo"
+    @if(isset($profile_file->id))
+        <a href="{{ route('index', ['username' => $user->username]) }}"><img id="profile-photo"
             src="{{ route('profile_photo', ['id' => $profile_file->id]) }}"/></a>
     @else
         <a href="{{ route('index', ['username' => $user->username]) }}"><img id="profile-photo"

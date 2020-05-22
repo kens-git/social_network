@@ -9,7 +9,8 @@ html {
 body {
   font-family: sans-serif;
   min-height: 100%;
-  overflow-x: hidden; }
+  overflow-x: hidden;
+  padding-bottom: 20px; }
   @media (min-width: 1200px) {
     body {
       margin: auto;
@@ -61,6 +62,7 @@ a {
   font-size: 40px;
   left: 245px;
   position: relative;
+  text-shadow: 2px 2px 4px black;
   top: -30px; }
 
 #profile-links {
@@ -328,6 +330,27 @@ a {
   background-color: #8cff8c;
   margin-right: auto; }
 
+#new-album-form {
+  margin: 20px auto 20px auto;
+  width: 400px; }
+
+#new-album-form input[type="text"] {
+  border: 1px solid #1450ff;
+  height: 32px;
+  padding-left: 8px;
+  width: 100%; }
+
+#new-album-form input[type="file"] {
+  margin-top: 8px; }
+
+#new-album-form input[type="submit"] {
+  background-color: #1e64ff;
+  color: white;
+  font-size: 14px;
+  margin-top: 8px;
+  padding: 4px;
+  width: 416px; }
+
 .album-link {
   color: black;
   display: block;
@@ -363,8 +386,17 @@ a {
 .file-preview-link {
   color: black;
   float: left;
-  height: 280px;
+  height: 300px;
   margin-top: 30px; }
+
+.set-as-link {
+  background-color: #1450ff;
+  border: none;
+  border-radius: 2px;
+  color: white;
+  display: inline;
+  font-size: 10px;
+  padding: 4px; }
 
 .album-image-preview {
   height: 250px;
@@ -416,6 +448,24 @@ a {
   max-height: 1000px;
   max-width: 1000px;
   object-fit: cover; }
+
+#file-comment-form {
+  margin: 20px auto 20px auto;
+  width: 400px; }
+
+#file-comment-form textarea {
+  border: 1px solid #1450ff;
+  height: 60px;
+  padding: 8px;
+  width: 100%; }
+
+#file-comment-form input[type="submit"] {
+  background-color: #1e64ff;
+  color: white;
+  font-size: 14px;
+  margin-top: 8px;
+  padding: 4px;
+  width: 416px; }
 
 .file-comment {
   color: black;

@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Album;
 use App\File;
+use App\FileComment;
 use App\User;
 use App\WallPost;
 use Auth;
@@ -26,8 +28,24 @@ class HomeController extends Controller
         //$posts = User::getWallPostsForUser($user);
         $cover_file = File::where('id', $user->cover_photo_id)->first();
         $profile_file = File::where('id', $user->profile_photo_id)->first();
+        $wall_posts = WallPost::where(['user_id' => $user->id])->take(10)->get();
+        foreach($wall_posts as &$post) {
+            $post['activity_type'] = 'wall_post';
+        }
+        $albums = Album::where(['user_id' => $user->id])->take(10)->get();
+        foreach($albums as &$album) {
+            $album['activity_type'] = 'album';
+        }
+        $file_comments = FileComment::where(['user_id' => $user->id])->take(10)->get();
+        foreach($file_comments as &$comment) {
+            $comment['activity_type'] = 'file_comment';
+        }
+        $activity = collect();
+        $activity = $activity->merge($wall_posts)->merge($albums)->merge($file_comments)
+            ->sortByDesc('created_at');
         return view('index')->with(['user' => $user, 'statuses' => $statuses,
-            'cover_file' => $cover_file, 'profile_file' => $profile_file]);
+            'cover_file' => $cover_file, 'profile_file' => $profile_file,
+            'activity' => $activity]);
     }
 
     public function postIndex(Request $request, $username, $parent_id = null) {

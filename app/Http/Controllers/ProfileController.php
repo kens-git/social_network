@@ -10,6 +10,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Storage;
+use Image;
 
 class ProfileController extends Controller {
     protected function getEditProfile() {
@@ -29,23 +30,34 @@ class ProfileController extends Controller {
             'email' => 'nullable|email',
             'website' => 'nullable'
         ]);
-
         $date = null;
         if($request->input('birth_date')) {
             $date = Carbon::createFromFormat('Y-m-d', $request->input('birth_date'));
         }
-
-        Auth::user()->update([
-            'password' => bcrypt($request->input('password')),
-            'first_name' => $request->input('first_name'),
-            'last_name' => $request->input('last_name'),
-            'occupation' => $request->input('occupation'),
-            'location' => $request->input('location'),
-            'birth_date' => $date,
-            'phone' => $request->input('phone'),
-            'email' => $request->input('email'),
-            'website' => $request->input('website')
-        ]);
+        if($request->input('password')) {
+            Auth::user()->update([
+                'password' => bcrypt($request->input('password')),
+                'first_name' => $request->input('first_name'),
+                'last_name' => $request->input('last_name'),
+                'occupation' => $request->input('occupation'),
+                'location' => $request->input('location'),
+                'birth_date' => $date,
+                'phone' => $request->input('phone'),
+                'email' => $request->input('email'),
+                'website' => $request->input('website')
+            ]);
+        } else {
+            Auth::user()->update([
+                'first_name' => $request->input('first_name'),
+                'last_name' => $request->input('last_name'),
+                'occupation' => $request->input('occupation'),
+                'location' => $request->input('location'),
+                'birth_date' => $date,
+                'phone' => $request->input('phone'),
+                'email' => $request->input('email'),
+                'website' => $request->input('website')
+            ]);
+        }
 
         return redirect()->route('index');
     }
@@ -59,6 +71,7 @@ class ProfileController extends Controller {
         if(!$user) {
             // TODO:
             //return 'should be user not found error';
+            dd('no user');
             return $this->getDefaultProfilePhoto();
         }
         $path = sprintf('uploads/%d/%d/%d.%s', $user->id, $file->album_id, $file->id, $file->extension);
@@ -69,12 +82,15 @@ class ProfileController extends Controller {
         }
 
         $file = Storage::get($path);
-        $type = Storage::mimeType($path);
+        $image = Image::make($file);
+        $image->fit(200, 200);
+        return $image->response();
+        // $type = Storage::mimeType($path);
 
-        $headers = ['Content-Type' => Storage::mimeType($path)];
-        $response = Response::make($file, 200, $headers);
+        // $headers = ['Content-Type' => Storage::mimeType($path)];
+        // $response = Response::make($file, 200, $headers);
     
-        return $response;
+        // return $response;
     }
 
     public function getCoverPhoto($id) {
@@ -96,12 +112,15 @@ class ProfileController extends Controller {
         }
 
         $file = Storage::get($path);
-        $type = Storage::mimeType($path);
+        $image = Image::make($file);
+        $image->fit(1200, 300);
+        return $image->response();
+        // $type = Storage::mimeType($path);
 
-        $headers = ['Content-Type' => Storage::mimeType($path)];
-        $response = Response::make($file, 200, $headers);
+        // $headers = ['Content-Type' => Storage::mimeType($path)];
+        // $response = Response::make($image, 200, $headers);
     
-        return $response;
+        // return $response;
     }
 
     protected function getDefaultCoverPhoto() {
@@ -122,7 +141,7 @@ class ProfileController extends Controller {
         return $response;
     }
 
-    public function postProfilePhoto($id) {
+    public function setProfilePhoto($id) {
         $file = File::where('id', $id)->first();
         if(!$file) {
             return 'file doesn\'t exist';
@@ -139,7 +158,7 @@ class ProfileController extends Controller {
         return redirect()->back();
     }
 
-    public function postCoverPhoto($id) {
+    public function setCoverPhoto($id) {
         // factor out with getProfilePhoto()
         $file = File::where('id', $id)->first();
         if(!$file) {
