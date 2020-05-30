@@ -1,19 +1,14 @@
-<div class="media">
-    <a class="pull-left" href="{{ route('index', ['username' => $user->username]) }}">
-        <img class="media-object" alt="No Profile Picture" src="">
-    </a>
-    <div class="media-body">
-        <h4 class="media-heading">
-            <a href="{{ route('index', ['username' => $user->username]) }}">
-                @if(isset($user->last_name))
-                    {{ $user->first_name }} {{ $user->last_name }}
-                @else
-                    No Name
-                @endif    
-            </a>
-        </h4>
-        @if($user->location)
-            <p>{{ $user->location }}</p>
+<a href="{{ route('index', ['username' => $user->username]) }}" class="directory-link">
+    <div class="directory-link-content">
+        @if(isset($user->profile_photo_id))
+            <img class="directory-profile-picture"
+                src="{{ route('profile_photo', ['id' => $user->profile_photo_id]) }}"/>
+        @else
+            <img class="directory-profile-picture" src="{{ route('profile_photo', ['id' => -1]) }}"/>
         @endif
+        <div class="directory-user-info">
+            <h1>{{ $user->getNameOrUsername() }}</h1>
+            <p class="directory-last-login">Last login: 4:00 PM, April 11, 2020</p>
+        </div>
     </div>
-</div>
+</a>
