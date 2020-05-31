@@ -97,7 +97,7 @@ a {
 
 .info-section-header {
   border-bottom: 1px solid black;
-  color: black;
+  color: #1450ff;
   font-size: 18px;
   font-weight: bold;
   margin-left: 20px;
@@ -186,6 +186,17 @@ a {
   height: 28px;
   outline: 0;
   width: 100px; }
+
+#wall-post-form #status-post-button {
+  background-color: #1e64ff;
+  border: 1px solid #1450ff;
+  border-radius: 2px;
+  color: white;
+  cursor: pointer;
+  font-size: 14px;
+  height: 28px;
+  outline: 0;
+  width: 160px; }
 
 .post-reply-input {
   border: 1px solid #1450ff;

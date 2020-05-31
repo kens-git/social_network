@@ -6,7 +6,7 @@
         <div id="wall-sidebar">
             <div id="info-section">
                 <h1 class="section-header">Bio</h1>
-                <h2 class="info-section-status"">Insert Status Here</h2>
+                <h2 class="info-section-status">{{ $user->status }}</h2>
                 <h2 class="info-section-header">Location</h2>
                 <h2 class="info-section-data">{{ $user->location }}</h2>
                 <h2 class="info-section-header">Occupation</h2>

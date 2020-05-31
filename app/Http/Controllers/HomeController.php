@@ -57,12 +57,16 @@ class HomeController extends Controller
             return 'user doesn\'t exist';
         }
 
-        WallPost::create([
-            'wall_user_id' => $wall_user->id,
-            'user_id' => Auth::user()->id,
-            'parent_id' => $parent_id,
-            'content' => $request->input('status')
-        ]);
+        if($request->post_button) {
+            WallPost::create([
+                'wall_user_id' => $wall_user->id,
+                'user_id' => Auth::user()->id,
+                'parent_id' => $parent_id,
+                'content' => $request->input('status')
+            ]);
+        } else if($request->status_button && $wall_user == Auth::user()) {
+            Auth::user()->update(['status' => $request->input('status')]);
+        }
         if($wall_user->id != Auth::user()->id) {
             return redirect()->route('index', [$wall_user->username]);
         }
