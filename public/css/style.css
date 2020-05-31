@@ -303,6 +303,23 @@ a {
   font-size: 18px;
   margin-top: 4px; }
 
+#send-message-form {
+  margin-bottom: 20px; }
+
+#send-message-form textarea {
+  border: 1px solid #1450ff;
+  height: 60px;
+  padding: 8px;
+  width: 708px; }
+
+#send-message-form input[type="submit"] {
+  background-color: #1e64ff;
+  color: white;
+  font-size: 14px;
+  margin-top: 8px;
+  padding: 4px;
+  width: 304px; }
+
 #messages-body {
   display: flex; }
 

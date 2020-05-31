@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use DB;
 use Auth;
+use App\File;
 use App\LastMessage;
 use App\Message;
 use App\User;
@@ -16,15 +17,21 @@ class MessageController extends Controller {
             if(!$other_user) {
                 return view('errors.user_not_found')->with('username', $username);
             }
+            $last_messages = Message::getLastMessages();
+            $cover_file = File::where('id', $other_user->cover_photo_id)->first();
+            $profile_file = File::where('id', $other_user->profile_photo_id)->first();
             $messages = Message::getMessagesDesc($other_user->id);
             if(!$messages->count()) {
-                return view('messages.send')->with('user', $other_user);
+                return view('messages.send')->with(['user' => $other_user,
+                    'cover_file' => $cover_file, 'profile_file' => $profile_file,
+                    'last_messages' => $last_messages]);
             }
             return view('messages.send')
-                ->with(['user' => $other_user, 'messages' => $messages]);
+                ->with(['user' => $other_user, 'messages' => $messages,
+                    'cover_file' => $cover_file, 'profile_file' => $profile_file,
+                    'last_messages' => $last_messages]);
         }
         $messages = Message::getLastMessages();
-        //dd($messages);
         return view('messages.index')
             ->with(['user' => Auth::user(), 'messages' => $messages]);
     }
@@ -60,8 +67,14 @@ class MessageController extends Controller {
                 ]);
             }
             $messages = Message::getMessagesDesc($user->id);
-            return view('messages.send', [$user->username])
-                ->with(['user' => $user, 'messages' => $messages]);
+            $other_user = User::where('username', $username)->first();
+            $cover_file = File::where('id', $other_user->cover_photo_id)->first();
+            $profile_file = File::where('id', $other_user->profile_photo_id)->first();
+            $last_messages = Message::getLastMessages();
+            return view('messages.send')
+                ->with(['user' => $other_user, 'messages' => $messages,
+                    'cover_file' => $cover_file, 'profile_file' => $profile_file,
+                    'last_messages' => $last_messages]);
         }
         return redirect()->back();
     }
