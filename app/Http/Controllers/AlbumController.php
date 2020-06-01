@@ -11,6 +11,8 @@ use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Storage;
+use FFMpeg\FFMpeg;
+use FFMpeg\Coordinate\TimeCode;
 
 class AlbumController extends Controller {
     public function getAlbums($username = null) {
@@ -53,20 +55,30 @@ class AlbumController extends Controller {
                 'description' => '',
                 'user_id' => Auth::user()->id
             ]);
+            //echo $dir_path;
             Storage::putFileAs($dir_path, $file, sprintf('%d.%s', $file_handle->id, $extension));
 
-            if($this->is_image($file->getMimeType())) {
-                $filenamewithextension = $file->getClientOriginalName();
-                //$filename = pathinfo($filenamewithextension, PATHINFO_FILENAME);
-                $extension = $this->mime2ext($file->getMimeType());
-                $filenametostore = $file_handle->id.'-thumbnail.'.$extension;
-                // TODO: any reason to store this just to retrieve it and resize it?
-                Storage::putFileAs($dir_path, $file, $filenametostore);
+            // if($this->is_image($file->getMimeType())) {
+            //     $filenamewithextension = $file->getClientOriginalName();
+            //     //$filename = pathinfo($filenamewithextension, PATHINFO_FILENAME);
+            //     $extension = $this->mime2ext($file->getMimeType());
+            //     $filenametostore = $file_handle->id.'-thumbnail.'.$extension;
+            //     // TODO: any reason to store this just to retrieve it and resize it?
+            //     Storage::putFileAs($dir_path, $file, $filenametostore);
+            //     $thumbnailpath = $dir_path.'/'.$filenametostore;
+            //     $img = Image::make(storage_path().'/app/files/'.$thumbnailpath)->resize(300, 300, function($constraint) {
+            //         $constraint->aspectRatio();
+            //     })->encode();
+            //     Storage::put($dir_path.'/'.$filenametostore, $img);
+            // }
+            if($this->is_video($file->getMimeType())) {
+                $ffmpeg = FFMpeg::create();
+                $video = $ffmpeg->open($file);
+                $frame = $video->frame(\FFMpeg\Coordinate\TimeCode::fromSeconds(0));
+                $filenametostore = $file_handle->id.'-preview.png';
                 $thumbnailpath = $dir_path.'/'.$filenametostore;
-                $img = Image::make(storage_path().'/app/files/'.$thumbnailpath)->resize(300, 300, function($constraint) {
-                    $constraint->aspectRatio();
-                })->encode();
-                Storage::put($dir_path.'/'.$filenametostore, $img);
+                $full_path = storage_path().'/app/files'.$thumbnailpath;
+                $frame->save($full_path);
             }
         }
         return redirect()->route('albums');
@@ -116,12 +128,20 @@ class AlbumController extends Controller {
             $image = Image::make($file);
             $image->fit(299, 250);
             return $image->response();
+        } else if($this->is_video($type)) {
+            $preview_path = sprintf('uploads/%d/%d/%d-preview.png', $user->id, $album_id, $file_id);
+            $image = Image::make(Storage::get($preview_path));
+            $image->fit(299, 250);
+            return $image->response();
         }
 
-        $headers = ['Content-Type' => Storage::mimeType($path)];
-        $response = Response::make($file, 200, $headers);
+        // $headers = ['Content-Type' => Storage::mimeType($path)];
+        // $response = Response::make($file, 200, $headers);
     
-        return $response;
+        // return $response;
+        $image = Image::make(Storage::get('document_preview.png'));
+        $image->fit(299, 250);
+        return $image->response();
     }
 
     public function getAlbumFile($username, $album_id, $file_id) {
@@ -256,6 +276,31 @@ class AlbumController extends Controller {
             'image/vnd.adobe.photoshop'                                                 => 'psd',
             'image/svg+xml'                                                             => 'svg',
             'image/tiff'                                                                => 'tiff',
+        ];
+
+        return isset($mime_map[$mime]) === true;
+    }
+
+    protected function is_video($mime) {
+        $mime_map = [
+            'video/3gpp2'                                                               => '3g2',
+            'video/3gp'                                                                 => '3gp',
+            'video/3gpp'                                                                => '3gp',
+            'video/x-msvideo'                                                           => 'avi',
+            'video/msvideo'                                                             => 'avi',
+            'video/avi'                                                                 => 'avi',
+            'video/x-f4v'                                                               => 'f4v',
+            'video/x-flv'                                                               => 'flv',
+            'video/mj2'                                                                 => 'jp2',
+            'video/quicktime'                                                           => 'mov',
+            'video/x-sgi-movie'                                                         => 'movie',
+            'video/mp4'                                                                 => 'mp4',
+            'video/mpeg'                                                                => 'mpeg',
+            'video/ogg'                                                                 => 'ogg',
+            'video/vnd.rn-realvideo'                                                    => 'rv',
+            'video/webm'                                                                => 'webm',
+            'video/x-ms-wmv'                                                            => 'wmv',
+            'video/x-ms-asf'                                                            => 'wmv',
         ];
 
         return isset($mime_map[$mime]) === true;
