@@ -20,7 +20,7 @@
                     'file_id' => $file->id]) }}"/>
                     <br/>
                     <p class="file-preview-comment-count">{{ $comment_count }} comments</p>
-                    @if($file->user_id == Auth::user()->id)
+                    @if($file->user_id == Auth::user()->id && in_array(strtolower($file->extension), ['jpg', 'jpeg', 'png', 'webp', 'bmp']))
                         <form action="{{ route('set_profile_photo', ['id' => $file->id]) }}" method="get">
                             @csrf()
                             <button class="set-as-link" type="submit">Set As Profile Picture</button>
