@@ -6,12 +6,14 @@
     @endif
     <div class="row">
         @if(in_array(strtolower($file->extension), ['mov', 'webm', 'mp4']))
-            <video
-                preload="false" src="{{ route('albums.file',
-                ['username' => $user->username,
-                'id' => $file->album_id,
-                'file_id' => $file->id]) }}" controls>
-            </video>
+            <div class="embed-responsive embed-responsive-16by9">
+                <video class="embed-responsive-item"
+                    preload="false" src="{{ route('albums.file',
+                    ['username' => $user->username,
+                    'id' => $file->album_id,
+                    'file_id' => $file->id]) }}" controls>
+                </video>
+            </div>
         @elseif(in_array(strtolower($file->extension), ['jpg', 'jpeg', 'png', 'gif']))
             <a href="{{ route('albums.file.full_size', 
                     ['username' => $user->username,

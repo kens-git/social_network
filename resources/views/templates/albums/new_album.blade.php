@@ -12,9 +12,6 @@
         @enderror
         <input type="file" name="files[]" multiple>
     </div>
-    <p style="color: #1e64ff; font-family: sans-serif; font-size: 12px; margin-top: 8px;">
-        Wait for page to refresh after submitting - uploads may fail otherwise.
-    </p>
     <div class="form-group">
         <input type="submit" value="Create Album">
     </div>

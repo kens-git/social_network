@@ -4,11 +4,11 @@
     @endphp
     <div class="wall-post-header">
         <a href="{{ route('index', ['username' => $user->username]) }}">
-            @if(isset($user->profile_photo_id))
+            @if(isset($header_file->id))
                 <img class="wall-post-profile-picture"
                     src="{{ route('profile_photo', ['id' => $user->profile_photo_id]) }}"/>
             @else
-                <img class="wall-post-profile-picture" src="{{ route('profile_photo', ['id' => -1]) }}"/></a>
+                <img class="wall-post-profile-picture" src="{{ route('profile_photo', ['id' => -1]) }}"/>
             @endif
         </a>
         <div class="wall-post-info">
