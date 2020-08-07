@@ -21,13 +21,13 @@ class AlbumController extends Controller {
             if(!$user) {
                 return view('errors.user_not_found')->with('username', $username);
             }
-            $albums = Album::getAlbums($user->id);
+            $albums = Album::getAlbums($user->id)->reverse();
             $cover_file = File::where('id', $user->cover_photo_id)->first();
             $profile_file = File::where('id', $user->profile_photo_id)->first();
             return view('albums.index')->with(['user' => $user, 'albums' => $albums,
                 'cover_file' => $cover_file, 'profile_file' => $profile_file]);
         }
-        $albums = Album::getAlbums();
+        $albums = Album::getAlbums()->reverse();
         return view('albums.index')->with(['user' => Auth::user(), 'albums' => $albums]);
     }
 

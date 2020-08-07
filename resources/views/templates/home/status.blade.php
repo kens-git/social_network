@@ -4,7 +4,7 @@
     @endphp
     <div class="wall-post-header">
         <a href="{{ route('index', ['username' => $user->username]) }}">
-            @if(isset($header_file->id))
+            @if(isset($user->profile_photo_id))
                 <img class="wall-post-profile-picture"
                     src="{{ route('profile_photo', ['id' => $user->profile_photo_id]) }}"/>
             @else
