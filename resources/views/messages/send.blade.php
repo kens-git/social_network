@@ -8,15 +8,15 @@
                 @foreach($last_messages as $message)
                     <a class="conversation"
                             href="{{ route('messages', $user->getWhichIsntMe($message->user1, $message->user2)->username) }}">
-                        @if(isset($header_file->id))
-                            <img class="conversation-profile-picture"
-                                src="{{ route('profile_photo', ['id' => $user->profile_photo_id]) }}"/>
-                        @else
-                            <img class="conversation-profile-picture" src="{{ route('profile_photo', ['id' => -1]) }}"/>
-                        @endif
                         @php
                             $other_user = $user->getWhichIsntMe($message->user1, $message->user2)
                         @endphp
+                        @if(isset($other_user->profile_photo_id))
+                            <img class="conversation-profile-picture"
+                                src="{{ route('profile_photo', ['id' => $other_user->profile_photo_id]) }}"/>
+                        @else
+                            <img class="conversation-profile-picture" src="{{ route('profile_photo', ['id' => -1]) }}"/>
+                        @endif
                         <div class="conversation-info">
                             <h1>{{ $other_user->getNameOrUsername() }}</h1>
                             <p class="conversation-timestmap">{{ $message->updated_at }}</p>
