@@ -17,7 +17,6 @@ class HomeController extends Controller
         if(!$username) {
             $username = Auth::user()->username;
         }
-        // why doesn't this work as a User::getUser($username) function?
         $user = User::where('username', $username)->first();
         if(!$user) {
             return view('errors.user_not_found')
@@ -25,7 +24,6 @@ class HomeController extends Controller
         }
         $statuses = WallPost::where(
             ['wall_user_id' => $user->id, 'parent_id' => null])->orderBy('updated_at', 'desc')->get();
-        //$posts = User::getWallPostsForUser($user);
         $cover_file = File::where('id', $user->cover_photo_id)->first();
         $profile_file = File::where('id', $user->profile_photo_id)->first();
         $wall_posts = WallPost::where(['user_id' => $user->id])->take(10)->get();

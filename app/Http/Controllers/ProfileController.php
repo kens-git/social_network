@@ -71,13 +71,10 @@ class ProfileController extends Controller {
         if(!$user) {
             // TODO:
             //return 'should be user not found error';
-            dd('no user');
             return $this->getDefaultProfilePhoto();
         }
         $path = sprintf('uploads/%d/%d/%d.%s', $user->id, $file->album_id, $file->id, $file->extension);
-        //dd($path);
         if(!Storage::exists($path)) {
-            // TODO: show error message
             return 'file not found on disk';
         }
 
@@ -85,12 +82,6 @@ class ProfileController extends Controller {
         $image = Image::make($file);
         $image->fit(200, 200);
         return $image->response();
-        // $type = Storage::mimeType($path);
-
-        // $headers = ['Content-Type' => Storage::mimeType($path)];
-        // $response = Response::make($file, 200, $headers);
-    
-        // return $response;
     }
 
     public function getCoverPhoto($id) {
@@ -105,7 +96,6 @@ class ProfileController extends Controller {
             return $this->getDefaultCoverPhoto();
         }
         $path = sprintf('uploads/%d/%d/%d.%s', $user->id, $file->album_id, $file->id, $file->extension);
-        //dd($path);
         if(!Storage::exists($path)) {
             // TODO: show error message
             return 'file not found on disk';
@@ -115,12 +105,6 @@ class ProfileController extends Controller {
         $image = Image::make($file);
         $image->fit(1200, 300);
         return $image->response();
-        // $type = Storage::mimeType($path);
-
-        // $headers = ['Content-Type' => Storage::mimeType($path)];
-        // $response = Response::make($image, 200, $headers);
-    
-        // return $response;
     }
 
     protected function getDefaultCoverPhoto() {
@@ -154,12 +138,12 @@ class ProfileController extends Controller {
             return 'can\'t set photo from another user\'s album';
         }
         Auth::user()->update(['profile_photo_id' => $id]);
-        // return view/route with success message
+        // TODO: return view/route with success message
         return redirect()->back();
     }
 
     public function setCoverPhoto($id) {
-        // factor out with getProfilePhoto()
+        // TODO: factor out with getProfilePhoto()
         $file = File::where('id', $id)->first();
         if(!$file) {
             return 'file doesn\'t exist';

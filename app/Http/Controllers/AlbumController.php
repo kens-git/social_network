@@ -134,11 +134,6 @@ class AlbumController extends Controller {
             $image->fit(299, 250);
             return $image->response();
         }
-
-        // $headers = ['Content-Type' => Storage::mimeType($path)];
-        // $response = Response::make($file, 200, $headers);
-    
-        // return $response;
         $image = Image::make(Storage::get('document_preview.png'));
         $image->fit(299, 250);
         return $image->response();
@@ -228,8 +223,6 @@ class AlbumController extends Controller {
             // TODO: file not found error view
             return 'file not found in database';
         }
-        // $path = storage_path('app/files/uploads/') . $username . '/' .
-        //     $album_id . '/' . $file_id . '.' . $file->extension;
         $user = User::where('username', $username)->first();
         if(!$user) {
             // TODO:
